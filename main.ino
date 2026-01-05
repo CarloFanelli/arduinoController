@@ -1,18 +1,15 @@
 #include <WiFiS3.h>
 #include <Arduino_LED_Matrix.h>
-#include "secrets.h"  // contiene WIFI_SSID e WIFI_PASS
+#include "secrets.h"
 
-// Oggetto matrice LED integrata
 ArduinoLEDMatrix matrix;
 
-// Credenziali WiFi (non hardcodate qui)
 const char* ssid = WIFI_SSID;
 const char* pass = WIFI_PASS;
 
 int status = WL_IDLE_STATUS;
 WiFiServer server(80);
 
-// Frame: matrice spenta
 uint8_t frame_off[8][12] = {
   {0,0,0,0,0,0,0,0,0,0,0,0},
   {0,0,0,0,0,0,0,0,0,0,0,0},
@@ -24,7 +21,6 @@ uint8_t frame_off[8][12] = {
   {0,0,0,0,0,0,0,0,0,0,0,0}
 };
 
-// Frame: matrice accesa
 uint8_t frame_on[8][12] = {
   {1,1,1,1,1,1,1,1,1,1,1,1},
   {1,1,1,1,1,1,1,1,1,1,1,1},
@@ -37,10 +33,8 @@ uint8_t frame_on[8][12] = {
 };
 
 void applyLedState(bool on) {
-  // LED integrato
   digitalWrite(LED_BUILTIN, on ? HIGH : LOW);
 
-  // Matrice LED sincronizzata
   if (on) {
     matrix.renderBitmap(frame_on, 8, 12);
   } else {
@@ -55,7 +49,6 @@ void setup() {
   Serial.begin(9600);
   while (!Serial);
 
-  // Avvio matrice LED e stato iniziale OFF
   matrix.begin();
   matrix.renderBitmap(frame_off, 8, 12);
 
@@ -119,7 +112,6 @@ void loop() {
     toOff = true;
   }
 
-  // Se la richiesta è /on o /off, reindirizza a /
   if (toOn || toOff) {
     client.println("HTTP/1.1 302 Found");
     client.println("Location: /");
